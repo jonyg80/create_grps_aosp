@@ -10,7 +10,7 @@ access_token = sys.argv[1]
 
 # Set the group ID and path to the Android XML file
 aosp1_group_id = "76264102"
-xml_file_path = "/workspaces/bookish-fortnight/android.xml"
+xml_file_path = "android.xml"
 
 # Parse the XML file and extract the project names
 tree = ET.parse(xml_file_path)
