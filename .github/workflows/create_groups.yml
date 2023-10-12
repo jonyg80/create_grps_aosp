@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install xml.etree.ElementTree requests
+        pip install requests
     #     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Run CLI command
