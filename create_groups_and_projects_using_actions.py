@@ -10,7 +10,7 @@ access_token = sys.argv[1]
 
 # Set the group ID and path to the Android XML file
 aosp1_group_id = "76264102"
-xml_file_path = "android.xml"
+xml_file_path = "manifest/default.xml"
 
 # Parse the XML file and extract the project names
 tree = ET.parse(xml_file_path)
@@ -28,7 +28,7 @@ for child in root:
         parent_id = aosp1_group_id
         # print("parent_id", parent_id)
         for group_part in group_parts:
-            # time.sleep(1)
+            time.sleep(1)
             print("group part", group_part)
             # Create the group if it doesn't exist
             # print("parent_id before search", parent_id)
@@ -62,7 +62,34 @@ for child in root:
                 if response.status_code == 201:
                     print(f"Group {group_part} created successfully.")
                     parent_id = response.json()["id"]
-                    time.sleep(5)
+                    time.sleep(10)
                 else:
                     print(f"Error creating group {group_part}: {response.text}")
                     break
+
+        # Create the project in the final subgroup
+        # search for project
+        time.sleep(1)
+        project_search_url = (
+            f"{api_endpoint}/groups/{parent_id}/projects?search={project_name}"
+        )
+        headers = {"Authorization": f"Bearer {access_token}"}
+        project_search_response = requests.get(project_search_url, headers=headers, timeout=10)
+        # Check if the response is an empty array
+        if (
+            project_search_response.status_code == 200
+            and len(project_search_response.json()) > 0
+        ):
+            search_project_id = project_search_response.json()[0]["id"]
+            print(f"Project {project_name} found with ID {search_project_id}.")
+        else:
+            print(f"Project {project_name} is not available.")
+            time.sleep(1)
+            url = f'{api_endpoint}/projects'
+            headers = {'Authorization': f'Bearer {access_token}'}
+            data = {'name': project_name, 'namespace_id': parent_id, 'visibility': 'public'}
+            response = requests.post(url, headers=headers, data=data, timeout=10)
+            if response.status_code == 201:
+                print(f'Project {project_name} created successfully.')
+            else:
+                print(f'Error creating project {project_name}: {response.text}')

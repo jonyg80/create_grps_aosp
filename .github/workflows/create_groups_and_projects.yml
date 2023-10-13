@@ -1,0 +1,32 @@
+name: Create groups and projects
+
+on:
+  schedule:
+    - cron: "0 0 * * 6"
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: clone manifest
+      run: git clone https://android.googlesource.com/mirror/manifest
+
+    - name: Run CLI command
+      env:
+        SECRET_KEY: ${{ secrets.Git_Token }}
+      run: |
+        python ./create_groups_and_projects_using_actions.py $SECRET_KEY
+    
