@@ -26,6 +26,7 @@ for child in root:
         group_parts = group_path.split("/")
         print("group_parts", group_parts)
         parent_id = aosp1_group_id
+        time.sleep(0.5)
         # print("parent_id", parent_id)
         for group_part in group_parts:
             # time.sleep(1)
@@ -74,7 +75,7 @@ for child in root:
             f"{api_endpoint}/groups/{parent_id}/projects?search={project_name}"
         )
         headers = {"Authorization": f"Bearer {access_token}"}
-        project_search_response = requests.get(project_search_url, headers=headers, timeout=10)
+        project_search_response = requests.get(project_search_url, headers=headers, timeout=30)
         # Check if the response is an empty array
         if (
             project_search_response.status_code == 200
@@ -88,7 +89,7 @@ for child in root:
             url = f'{api_endpoint}/projects'
             headers = {'Authorization': f'Bearer {access_token}'}
             data = {'name': project_name, 'namespace_id': parent_id, 'visibility': 'public'}
-            response = requests.post(url, headers=headers, data=data, timeout=10)
+            response = requests.post(url, headers=headers, data=data, timeout=30)
             if response.status_code == 201:
                 print(f'Project {project_name} created successfully.')
             else:
