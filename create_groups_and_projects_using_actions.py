@@ -28,7 +28,7 @@ for child in root:
         parent_id = aosp1_group_id
         # print("parent_id", parent_id)
         for group_part in group_parts:
-            time.sleep(1)
+            # time.sleep(1)
             print("group part", group_part)
             # Create the group if it doesn't exist
             # print("parent_id before search", parent_id)
@@ -69,7 +69,7 @@ for child in root:
 
         # Create the project in the final subgroup
         # search for project
-        time.sleep(1)
+        # time.sleep(1)
         project_search_url = (
             f"{api_endpoint}/groups/{parent_id}/projects?search={project_name}"
         )
@@ -84,7 +84,7 @@ for child in root:
             print(f"Project {project_name} found with ID {search_project_id}.")
         else:
             print(f"Project {project_name} is not available.")
-            time.sleep(1)
+            # time.sleep(1)
             url = f'{api_endpoint}/projects'
             headers = {'Authorization': f'Bearer {access_token}'}
             data = {'name': project_name, 'namespace_id': parent_id, 'visibility': 'public'}
