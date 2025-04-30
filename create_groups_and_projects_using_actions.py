@@ -4,12 +4,12 @@ import time
 import sys
 
 # Set the GitLab API endpoint and access token
-api_endpoint = "https://gitlab.com/api/v4"
+api_endpoint = "https://gitgud.io/api/v4"
 # get token from cli
 access_token = sys.argv[1]
 
 # Set the group ID and path to the Android XML file
-aosp1_group_id = "76264102"
+aosp1_group_id = "121574"
 xml_file_path = "manifest/default.xml"
 
 # Parse the XML file and extract the project names
