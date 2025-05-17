@@ -12,6 +12,30 @@ access_token = sys.argv[1]
 aosp1_group_id = "121574"
 xml_file_path = "manifest/default.xml"
 
+# Function to check if a project with same name as group exists
+def check_project_name_conflict(group_name, parent_id, headers):
+    search_url = f"{api_endpoint}/groups/{parent_id}/projects?search={group_name}"
+    response = requests.get(search_url, headers=headers, timeout=30)
+    
+    if response.status_code == 200 and len(response.json()) > 0:
+        # Check if any of the projects has the exact same name
+        for project in response.json():
+            if project["name"].lower() == group_name.lower():
+                return project["id"]
+    return None
+
+# Function to rename a project
+def rename_project(project_id, new_name, headers):
+    url = f"{api_endpoint}/projects/{project_id}"
+    data = {"name": new_name}
+    response = requests.put(url, headers=headers, data=data, timeout=30)
+    if response.status_code == 200:
+        print(f"Project renamed to {new_name} successfully.")
+        return True
+    else:
+        print(f"Error renaming project: {response.text}")
+        return False
+
 # Parse the XML file and extract the project names
 tree = ET.parse(xml_file_path)
 root = tree.getroot()
@@ -29,7 +53,6 @@ for child in root:
         time.sleep(0.5)
         # print("parent_id", parent_id)
         for group_part in group_parts:
-            # time.sleep(1)
             print("group part", group_part)
             # Create the group if it doesn't exist
             # print("parent_id before search", parent_id)
@@ -38,9 +61,6 @@ for child in root:
             )
             headers = {"Authorization": f"Bearer {access_token}"}
             group_search_response = requests.get(group_search_url, headers=headers)
-            # print("group_search_response", group_search_response)
-            # print("group_search_response.status_code", group_search_response.status_code)
-            # print("group_search_response.json()", group_search_response.json())
 
             # Check if the response is an empty array
             if (
@@ -56,6 +76,19 @@ for child in root:
                 # print("parent_id after search", parent_id)
             else:
                 print(f"Group path {group_path} is not available.")
+                
+                # Check if a conflicting project exists with same name as group
+                conflicting_project_id = check_project_name_conflict(group_part, parent_id, headers)
+                if conflicting_project_id:
+                    print(f"Found conflicting project with ID {conflicting_project_id}")
+                    new_project_name = f"{group_part}_project"
+                    if rename_project(conflicting_project_id, new_project_name, headers):
+                        print(f"Renamed conflicting project to {new_project_name}")
+                        time.sleep(2)  # Wait for the rename to take effect
+                    else:
+                        print("Failed to rename conflicting project, skipping group creation")
+                        break
+                
                 url = f"{api_endpoint}/groups"
                 headers = {"Authorization": f"Bearer {access_token}"}
                 data = {"name": group_part, "path": group_part, "parent_id": parent_id, 'visibility': 'public'}
